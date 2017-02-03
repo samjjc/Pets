@@ -1,5 +1,7 @@
 package com.example.android.pets;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -20,7 +22,7 @@ import com.example.android.pets.data.PetDbHelper;
  */
 public class EditorActivity extends AppCompatActivity {
 
-    PetDbHelper mDb
+    PetDbHelper mDbHelper;
 
     /** EditText field to enter the pet's name */
     private EditText mNameEditText;
@@ -52,6 +54,7 @@ public class EditorActivity extends AppCompatActivity {
         mGenderSpinner = (Spinner) findViewById(R.id.spinner_gender);
 
         setupSpinner();
+        mDbHelper = new PetDbHelper();
     }
 
     /**
@@ -94,10 +97,20 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     private void insertPet() {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
         String nameString = mNameEditText.getText().toString().trim();
         String breedString = mBreedEditText.getText().toString().trim();
         int gender = mGender;
         int weight = Integer.parseInt(mWeightEditText.getText().toString().trim());
+
+        ContentValues values = new ContentValues();
+        values.put(PetEntry.COLUMN_PET_NAME, nameString);
+        values.put(PetEntry.COLUMN_PET_BREED, breedString);
+        values.put(PetEntry.COLUMN_PET_GENDER, mGender);
+        values.put(PetEntry.COLUMN_PET_WEIGHT, weight);
+
+        db.insert(PetEntry.TABLE_NAME, null, values);
 
     }
 
