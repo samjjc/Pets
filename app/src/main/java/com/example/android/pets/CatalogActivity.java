@@ -11,7 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.ListView;
 
 import com.example.android.pets.data.PetContract.PetEntry;
 import com.example.android.pets.data.PetDbHelper;
@@ -75,45 +75,16 @@ public class CatalogActivity extends AppCompatActivity {
 
         Cursor cursor = getContentResolver().query(PetEntry.CONTENT_URI,projection,null,null,null);
 
-        TextView displayView = (TextView) findViewById(R.id.text_view_pet);
+        ListView petListView = (ListView) findViewById(R.id.list);
 
-        try {
+        View emptyView = findViewById(R.id.empty_view);
+        petListView.setEmptyView(emptyView);
 
-            displayView.setText("The pets table contains "+ cursor.getCount()+" pets.\n\n");
-            displayView.append(PetEntry._ID + " - "+
-                    PetEntry.COLUMN_PET_NAME+" - "+
-                    PetEntry.COLUMN_PET_BREED+" - "+
-                    PetEntry.COLUMN_PET_GENDER+" - "+
-                    PetEntry.COLUMN_PET_WEIGHT+"\n");
+        PetCursorAdapter adapter = new PetCursorAdapter(this, cursor);
 
-            int idColunmIndex = cursor.getColumnIndex(PetEntry._ID);
-            int nameColunmIndex = cursor.getColumnIndex(PetEntry.COLUMN_PET_NAME);
-            int breedColunmIndex = cursor.getColumnIndex(PetEntry.COLUMN_PET_BREED);
-            int genderColunmIndex = cursor.getColumnIndex(PetEntry.COLUMN_PET_GENDER);
-            int weightColunmIndex = cursor.getColumnIndex(PetEntry.COLUMN_PET_WEIGHT);
-
-            while (cursor.moveToNext()){
-                int currentID = cursor.getInt(idColunmIndex);
-                String currentName = cursor.getString(nameColunmIndex);
-                String currentBreed = cursor.getString(breedColunmIndex);
-                int currentGender = cursor.getInt(genderColunmIndex);
-                int currentWeight = cursor.getInt(weightColunmIndex);
-
-                displayView.append("\n"+ currentID + " - "+
-                        currentName+" - "+
-                        currentBreed+" - "+
-                        currentGender+" - "+
-                        currentWeight);
-            }
+        petListView.setAdapter(adapter);
 
 
-
-
-        } finally {
-            // Always close the cursor when you're done reading from it. This releases all its
-            // resources and makes it invalid.
-            cursor.close();
-        }
     }
 
     private void insertPets(){
